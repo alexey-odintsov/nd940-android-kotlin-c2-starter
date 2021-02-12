@@ -7,3 +7,21 @@ Use the updated Gradle version in the `~/gradle/wrapper/gradle-wrapper.propertie
 ```
 distributionUrl = https\://services.gradle.org/distributions/gradle-6.1.1-all.zip
 ```
+## TheMoviesDB API key
+This project uses NASA API key. To properly call NASA API please request API key and place the following line
+
+```
+NASA_API_KEY="YOUR_API_KEY"
+```
+
+it in the following file:
+
+*Mac, Linux*
+```
+/home/YOUR_USERNAME/.gradle/gradle.properties
+```
+
+*Windows*
+```
+C:\Users\YOUR_USERNAME\.gradle\gradle.properties
+```
