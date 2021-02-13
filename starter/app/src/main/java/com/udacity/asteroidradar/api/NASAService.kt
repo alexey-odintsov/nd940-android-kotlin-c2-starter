@@ -2,7 +2,6 @@ package com.udacity.asteroidradar.api
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import com.udacity.asteroidradar.Asteroids
 import com.udacity.asteroidradar.BuildConfig
 import com.udacity.asteroidradar.PictureOfDay
 import okhttp3.Interceptor
@@ -10,13 +9,14 @@ import okhttp3.OkHttpClient
 import okhttp3.Response
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.converter.scalars.ScalarsConverterFactory
 import retrofit2.http.GET
 
 const val BASE_URL = "https://api.nasa.gov/"
 
 interface NASAService {
     @GET("neo/rest/v1/feed")
-    suspend fun getAsteroids(): Asteroids
+    suspend fun getAsteroids(): String
 
     @GET("planetary/apod")
     suspend fun getPictureOfTheDay(): PictureOfDay
@@ -37,16 +37,19 @@ private class ApiKeyInterceptor : Interceptor {
  * JSON converter
  */
 private val moshi = Moshi.Builder()
-        .add(KotlinJsonAdapterFactory())
-        .build()
+    .add(KotlinJsonAdapterFactory())
+    .build()
 
 private val retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .addConverterFactory(MoshiConverterFactory.create(moshi))
-        .client(OkHttpClient.Builder()
-                .addInterceptor(ApiKeyInterceptor())
-                .build())
-        .build()
+    .baseUrl(BASE_URL)
+    .addConverterFactory(ScalarsConverterFactory.create()) // order matters
+    .addConverterFactory(MoshiConverterFactory.create(moshi))
+    .client(
+        OkHttpClient.Builder()
+            .addInterceptor(ApiKeyInterceptor())
+            .build()
+    )
+    .build()
 
 object NASAApi {
     val RETROFIT_SERVICE: NASAService by lazy { retrofit.create(NASAService::class.java) }
