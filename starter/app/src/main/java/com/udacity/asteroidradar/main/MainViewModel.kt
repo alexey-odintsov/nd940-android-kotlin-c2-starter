@@ -31,6 +31,11 @@ class MainViewModel : ViewModel() {
     val asteroids: LiveData<List<Asteroid>>
         get() = _asteroids
 
+    // Navigate to details
+    private val _navigateToDetails = MutableLiveData<Asteroid>()
+    val navigateToDetails: LiveData<Asteroid>
+        get() = _navigateToDetails
+
     init {
         getPictureOfTheDay()
         getAsteroids()
@@ -53,7 +58,7 @@ class MainViewModel : ViewModel() {
             try {
                 _status.value = ApiStatus.LOADING
                 val result =
-                    parseAsteroidsJsonResult(JSONObject(NASAApi.RETROFIT_SERVICE.getAsteroids()))
+                        parseAsteroidsJsonResult(JSONObject(NASAApi.RETROFIT_SERVICE.getAsteroids()))
                 Log.d("NASA", "found ${result.size} elements")
                 _asteroids.value = result
                 _status.value = ApiStatus.DONE
@@ -63,5 +68,13 @@ class MainViewModel : ViewModel() {
                 _asteroids.value = null
             }
         }
+    }
+
+    fun displayAsteroidDetails(asteroid: Asteroid) {
+        _navigateToDetails.value = asteroid
+    }
+
+    fun displayAsteroidDetailsComplete() {
+        _navigateToDetails.value = null
     }
 }
