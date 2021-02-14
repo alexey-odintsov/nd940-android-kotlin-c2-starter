@@ -1,13 +1,28 @@
 package com.udacity.asteroidradar
 
+import android.view.View
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.net.toUri
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
+import com.udacity.asteroidradar.main.ApiStatus
 import com.udacity.asteroidradar.main.AsteroidAdapter
 
+
+@BindingAdapter("loadingStatus")
+fun bindLoadingStatus(progressBar: ProgressBar, status: ApiStatus?) {
+    when (status) {
+        ApiStatus.LOADING -> {
+            progressBar.visibility = View.VISIBLE
+        }
+        else -> {
+            progressBar.visibility = View.GONE
+        }
+    }
+}
 
 @BindingAdapter("listData")
 fun bindRecyclerView(recyclerView: RecyclerView, data: List<Asteroid>?) {
