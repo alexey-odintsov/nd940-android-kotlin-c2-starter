@@ -1,22 +1,22 @@
 package com.udacity.asteroidradar.main
 
+import android.app.Application
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.udacity.asteroidradar.model.Asteroid
-import com.udacity.asteroidradar.model.PictureOfDay
+import androidx.lifecycle.*
 import com.udacity.asteroidradar.api.DEFAULT_END_DATE_DAYS
 import com.udacity.asteroidradar.api.NASAApi
 import com.udacity.asteroidradar.api.getDayFormatted
 import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
+import com.udacity.asteroidradar.data.local.AsteroidDatabaseDao
+import com.udacity.asteroidradar.model.Asteroid
+import com.udacity.asteroidradar.model.PictureOfDay
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 enum class ApiStatus { LOADING, ERROR, DONE }
 enum class AsteroidFilter { WEEK, TODAY, SAVED }
-class MainViewModel : ViewModel() {
+class MainViewModel(val database: AsteroidDatabaseDao,
+                    application: Application) : AndroidViewModel(application) {
     private var filter = AsteroidFilter.WEEK
 
     // Picture of the day
@@ -98,4 +98,17 @@ class MainViewModel : ViewModel() {
         }
         this.filter = filter
     }
+
+    class Factory(
+            private val dataSource: AsteroidDatabaseDao,
+            private val application: Application) : ViewModelProvider.Factory {
+        @Suppress("unchecked_cast")
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
+                return MainViewModel(dataSource, application) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
+        }
+    }
+
 }

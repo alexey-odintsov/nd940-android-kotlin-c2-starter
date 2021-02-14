@@ -7,19 +7,23 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.udacity.asteroidradar.R
+import com.udacity.asteroidradar.data.local.AsteroidDatabase
 import com.udacity.asteroidradar.databinding.FragmentMainBinding
 
 class MainFragment : Fragment() {
-
-    private val viewModel: MainViewModel by lazy {
-        ViewModelProvider(this).get(MainViewModel::class.java)
-    }
+    private lateinit var viewModel: MainViewModel
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View {
+        val application = requireNotNull(this.activity).application
+        val dataSource = AsteroidDatabase.getInstance(application).asteroidDatabaseDao
+
         val binding = FragmentMainBinding.inflate(inflater)
+        val viewModelFactory = MainViewModel.Factory(dataSource, application)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
+
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
         binding.asteroidRecycler.adapter = AsteroidAdapter(AsteroidAdapter.OnClickListener {
@@ -32,6 +36,7 @@ class MainFragment : Fragment() {
                 viewModel.displayAsteroidDetailsComplete()
             }
         })
+
         setHasOptionsMenu(true)
 
         return binding.root
