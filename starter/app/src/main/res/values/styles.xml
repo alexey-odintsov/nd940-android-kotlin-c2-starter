@@ -8,4 +8,12 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="DefaultText" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@color/default_text_color</item>
+    </style>
+
+    <style name="Header" parent="DefaultText">
+        <item name="android:textStyle">bold</item>
+    </style>
+
 </resources>

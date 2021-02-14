@@ -20,21 +20,21 @@
 
         <TextView
             android:id="@+id/textView2"
+            style="@style/Header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@{asteroid.codename}"
-            android:textColor="@color/default_text_color"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Asteroid name" />
 
         <TextView
             android:id="@+id/textView3"
+            style="@style/DefaultText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="@{asteroid.closeApproachDate}"
-            android:textColor="@color/default_text_color"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView2"
             tools:text="Asteroid date" />
