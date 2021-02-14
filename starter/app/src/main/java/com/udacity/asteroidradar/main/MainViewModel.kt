@@ -7,14 +7,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.PictureOfDay
+import com.udacity.asteroidradar.api.DEFAULT_END_DATE_DAYS
 import com.udacity.asteroidradar.api.NASAApi
+import com.udacity.asteroidradar.api.getDayFormatted
 import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 enum class ApiStatus { LOADING, ERROR, DONE }
-
+enum class AsteroidFilter { WEEK, TODAY, SAVED }
 class MainViewModel : ViewModel() {
+    private var filter = AsteroidFilter.WEEK
 
     // Picture of the day
     private val _pictureOfDay = MutableLiveData<PictureOfDay>()
@@ -57,8 +60,10 @@ class MainViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 _status.value = ApiStatus.LOADING
-                val result =
-                        parseAsteroidsJsonResult(JSONObject(NASAApi.RETROFIT_SERVICE.getAsteroids()))
+                val dates = getFilterDates()
+                val result = parseAsteroidsJsonResult(
+                        JSONObject(NASAApi.RETROFIT_SERVICE.getAsteroids(dates.first, dates.second))
+                )
                 Log.d("NASA", "found ${result.size} elements")
                 _asteroids.value = result
                 _status.value = ApiStatus.DONE
@@ -70,11 +75,27 @@ class MainViewModel : ViewModel() {
         }
     }
 
+    private fun getFilterDates(): Pair<String, String> {
+        val today = getDayFormatted(0)
+        val todayPlus7 = getDayFormatted(DEFAULT_END_DATE_DAYS)
+        return when (filter) {
+            AsteroidFilter.TODAY -> Pair(today, today)
+            else -> Pair(today, todayPlus7)
+        }
+    }
+
     fun displayAsteroidDetails(asteroid: Asteroid) {
         _navigateToDetails.value = asteroid
     }
 
     fun displayAsteroidDetailsComplete() {
         _navigateToDetails.value = null
+    }
+
+    fun updateFilter(filter: AsteroidFilter) {
+        if (this.filter != filter) {
+            getAsteroids()
+        }
+        this.filter = filter;
     }
 }

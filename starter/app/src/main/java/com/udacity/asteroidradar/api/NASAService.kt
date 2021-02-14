@@ -11,12 +11,16 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Query
 
 const val BASE_URL = "https://api.nasa.gov/"
 
 interface NASAService {
     @GET("neo/rest/v1/feed")
-    suspend fun getAsteroids(): String
+    suspend fun getAsteroids(
+            @Query("start_date") startDate: String?,
+            @Query("end_date") endDate: String?
+    ): String
 
     @GET("planetary/apod")
     suspend fun getPictureOfTheDay(): PictureOfDay
@@ -37,19 +41,19 @@ private class ApiKeyInterceptor : Interceptor {
  * JSON converter
  */
 private val moshi = Moshi.Builder()
-    .add(KotlinJsonAdapterFactory())
-    .build()
+        .add(KotlinJsonAdapterFactory())
+        .build()
 
 private val retrofit = Retrofit.Builder()
-    .baseUrl(BASE_URL)
-    .addConverterFactory(ScalarsConverterFactory.create()) // order matters
-    .addConverterFactory(MoshiConverterFactory.create(moshi))
-    .client(
-        OkHttpClient.Builder()
-            .addInterceptor(ApiKeyInterceptor())
-            .build()
-    )
-    .build()
+        .baseUrl(BASE_URL)
+        .addConverterFactory(ScalarsConverterFactory.create()) // order matters
+        .addConverterFactory(MoshiConverterFactory.create(moshi))
+        .client(
+                OkHttpClient.Builder()
+                        .addInterceptor(ApiKeyInterceptor())
+                        .build()
+        )
+        .build()
 
 object NASAApi {
     val RETROFIT_SERVICE: NASAService by lazy { retrofit.create(NASAService::class.java) }
