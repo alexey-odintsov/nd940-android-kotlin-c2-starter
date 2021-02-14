@@ -5,8 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.udacity.asteroidradar.Asteroid
-import com.udacity.asteroidradar.PictureOfDay
+import com.udacity.asteroidradar.model.Asteroid
+import com.udacity.asteroidradar.model.PictureOfDay
 import com.udacity.asteroidradar.api.DEFAULT_END_DATE_DAYS
 import com.udacity.asteroidradar.api.NASAApi
 import com.udacity.asteroidradar.api.getDayFormatted
@@ -96,6 +96,6 @@ class MainViewModel : ViewModel() {
         if (this.filter != filter) {
             getAsteroids()
         }
-        this.filter = filter;
+        this.filter = filter
     }
 }

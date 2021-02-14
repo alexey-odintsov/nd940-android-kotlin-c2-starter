@@ -3,7 +3,7 @@ package com.udacity.asteroidradar.api
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.udacity.asteroidradar.BuildConfig
-import com.udacity.asteroidradar.PictureOfDay
+import com.udacity.asteroidradar.model.PictureOfDay
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response

@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 import com.udacity.asteroidradar.main.ApiStatus
 import com.udacity.asteroidradar.main.AsteroidAdapter
+import com.udacity.asteroidradar.model.Asteroid
 
 
 @BindingAdapter("loadingStatus")
