@@ -1,6 +1,7 @@
 package com.udacity.asteroidradar.model
 
 import android.os.Parcelable
+import com.udacity.asteroidradar.data.local.AsteroidEntity
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
@@ -14,3 +15,18 @@ public data class Asteroid(
     val distanceFromEarth: Double,
     val isPotentiallyHazardous: Boolean
 ) : Parcelable
+
+fun ArrayList<Asteroid>.asDatabaseModel(): List<AsteroidEntity> {
+    return map {
+        AsteroidEntity(
+            id = it.id,
+            codename = it.codename,
+            closeApproachDate = it.closeApproachDate,
+            absoluteMagnitude = it.absoluteMagnitude,
+            estimatedDiameter = it.estimatedDiameter,
+            relativeVelocity = it.relativeVelocity,
+            distanceFromEarth = it.distanceFromEarth,
+            isPotentiallyHazardous = it.isPotentiallyHazardous
+        )
+    }
+}

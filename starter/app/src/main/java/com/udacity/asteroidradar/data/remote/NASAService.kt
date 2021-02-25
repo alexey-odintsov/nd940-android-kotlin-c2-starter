@@ -1,9 +1,11 @@
 package com.udacity.asteroidradar.api
 
+import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.udacity.asteroidradar.BuildConfig
 import com.udacity.asteroidradar.model.PictureOfDay
+import kotlinx.coroutines.Deferred
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
@@ -18,9 +20,12 @@ const val BASE_URL = "https://api.nasa.gov/"
 interface NASAService {
     @GET("neo/rest/v1/feed")
     suspend fun getAsteroids(
-            @Query("start_date") startDate: String?,
-            @Query("end_date") endDate: String?
+        @Query("start_date") startDate: String?,
+        @Query("end_date") endDate: String?
     ): String
+
+    @GET("neo/rest/v1/feed")
+    fun getAllAsteroids(): Deferred<String>
 
     @GET("planetary/apod")
     suspend fun getPictureOfTheDay(): PictureOfDay
@@ -41,19 +46,20 @@ private class ApiKeyInterceptor : Interceptor {
  * JSON converter
  */
 private val moshi = Moshi.Builder()
-        .add(KotlinJsonAdapterFactory())
-        .build()
+    .add(KotlinJsonAdapterFactory())
+    .build()
 
 private val retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .addConverterFactory(ScalarsConverterFactory.create()) // order matters
-        .addConverterFactory(MoshiConverterFactory.create(moshi))
-        .client(
-                OkHttpClient.Builder()
-                        .addInterceptor(ApiKeyInterceptor())
-                        .build()
-        )
-        .build()
+    .baseUrl(BASE_URL)
+    .addConverterFactory(ScalarsConverterFactory.create()) // order matters
+    .addConverterFactory(MoshiConverterFactory.create(moshi))
+    .addCallAdapterFactory(CoroutineCallAdapterFactory())
+    .client(
+        OkHttpClient.Builder()
+            .addInterceptor(ApiKeyInterceptor())
+            .build()
+    )
+    .build()
 
 object NASAApi {
     val RETROFIT_SERVICE: NASAService by lazy { retrofit.create(NASAService::class.java) }

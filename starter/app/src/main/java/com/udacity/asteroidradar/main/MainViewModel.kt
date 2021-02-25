@@ -8,9 +8,13 @@ import com.udacity.asteroidradar.api.NASAApi
 import com.udacity.asteroidradar.api.getDayFormatted
 import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
 import com.udacity.asteroidradar.data.local.AsteroidDatabaseDao
+import com.udacity.asteroidradar.data.local.asDomainModel
 import com.udacity.asteroidradar.model.Asteroid
 import com.udacity.asteroidradar.model.PictureOfDay
+import com.udacity.asteroidradar.model.asDatabaseModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
 enum class ApiStatus { LOADING, ERROR, DONE }
@@ -30,9 +34,9 @@ class MainViewModel(val database: AsteroidDatabaseDao,
         get() = _status
 
     // Asteroids
-    private val _asteroids = MutableLiveData<List<Asteroid>>()
-    val asteroids: LiveData<List<Asteroid>>
-        get() = _asteroids
+    val asteroids: LiveData<List<Asteroid>> = Transformations.map(database.getAllAsteroids()) {
+        it.asDomainModel()
+    }
 
     // Navigate to details
     private val _navigateToDetails = MutableLiveData<Asteroid>()
@@ -41,7 +45,9 @@ class MainViewModel(val database: AsteroidDatabaseDao,
 
     init {
         getPictureOfTheDay()
-        getAsteroids()
+        viewModelScope.launch {
+            refreshAsteroids()
+        }
     }
 
     private fun getPictureOfTheDay() {
@@ -56,6 +62,16 @@ class MainViewModel(val database: AsteroidDatabaseDao,
         }
     }
 
+    private suspend fun refreshAsteroids() {
+        withContext(Dispatchers.IO) {
+            val response = NASAApi.RETROFIT_SERVICE.getAllAsteroids().await();
+            val syncedAsteroids: ArrayList<Asteroid> = parseAsteroidsJsonResult(
+                    JSONObject(response)
+            )
+            database.insertNewAsteroids(*syncedAsteroids.asDatabaseModel().toTypedArray())
+        }
+    }
+
     private fun getAsteroids() {
         viewModelScope.launch {
             try {
@@ -65,12 +81,10 @@ class MainViewModel(val database: AsteroidDatabaseDao,
                         JSONObject(NASAApi.RETROFIT_SERVICE.getAsteroids(dates.first, dates.second))
                 )
                 Log.d("NASA", "found ${result.size} elements")
-                _asteroids.value = result
                 _status.value = ApiStatus.DONE
             } catch (e: Exception) {
                 Log.e("NASA", "$e")
                 _status.value = ApiStatus.ERROR
-                _asteroids.value = null
             }
         }
     }
