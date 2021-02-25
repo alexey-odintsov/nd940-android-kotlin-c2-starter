@@ -2,6 +2,7 @@ package com.udacity.asteroidradar.data.local
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.udacity.asteroidradar.data.local.entities.AsteroidEntity
 
 @Dao
 interface AsteroidDatabaseDao {
@@ -19,6 +20,9 @@ interface AsteroidDatabaseDao {
 
     @Query("SELECT * from asteroids WHERE close_approach_date = :today")
     suspend fun getTodayAsteroids(today: String): AsteroidEntity?
+
+    @Query("SELECT * from asteroids WHERE close_approach_date >= :dateFrom AND close_approach_date < :dateTo")
+    fun getAsteroids(dateFrom: String, dateTo: String): LiveData<List<AsteroidEntity>>
 
     @Query("SELECT * FROM asteroids ORDER BY close_approach_date ASC")
     fun getAllAsteroids(): LiveData<List<AsteroidEntity>>

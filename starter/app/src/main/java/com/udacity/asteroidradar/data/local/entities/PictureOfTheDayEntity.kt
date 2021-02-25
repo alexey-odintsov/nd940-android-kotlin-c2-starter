@@ -1,4 +1,4 @@
-package com.udacity.asteroidradar.data.local
+package com.udacity.asteroidradar.data.local.entities
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

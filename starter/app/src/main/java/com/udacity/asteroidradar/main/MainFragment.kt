@@ -6,8 +6,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.udacity.asteroidradar.App
 import com.udacity.asteroidradar.R
-import com.udacity.asteroidradar.data.local.AsteroidDatabase
 import com.udacity.asteroidradar.databinding.FragmentMainBinding
 
 class MainFragment : Fragment() {
@@ -17,11 +17,10 @@ class MainFragment : Fragment() {
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View {
-        val application = requireNotNull(this.activity).application
-        val dataSource = AsteroidDatabase.getInstance(application).asteroidDatabaseDao
+        val application = requireNotNull(this.activity).application as App
 
         val binding = FragmentMainBinding.inflate(inflater)
-        val viewModelFactory = MainViewModel.Factory(dataSource, application)
+        val viewModelFactory = MainViewModel.Factory(application)
         viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
 
         binding.lifecycleOwner = this
@@ -48,13 +47,11 @@ class MainFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        viewModel.updateFilter(
-                when (item.itemId) {
-                    R.id.menu_show_today -> AsteroidFilter.TODAY
-                    R.id.menu_show_week -> AsteroidFilter.WEEK
-                    else -> AsteroidFilter.SAVED
-                }
-        )
+        when (item.itemId) {
+            R.id.menu_show_today -> viewModel.showTodayAsteroids()
+            R.id.menu_show_week -> viewModel.showWeekAsteroids()
+            else -> viewModel.showSavedAsteroids()
+        }
         return true
     }
 }
